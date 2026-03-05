@@ -8,10 +8,19 @@ if (!ApiKey) {
   console.warn('[anthropic] ANTHROPIC_API_KEY no configurado — la extracción IA no funcionará')
 }
 
-// Singleton para uso con env var (backward compat y uso sin async context)
-export const anthropic = new Anthropic({
+let _anthropicInstance: Anthropic | null = null;
+
+export const anthropic = new Proxy({} as Anthropic, {
+  get(target, prop, receiver) {
+    if (!_anthropicInstance) {
+      _anthropicInstance = new Anthropic({
+        // Usamos || para que si es string vacío también use el placeholder válido
   apiKey: ApiKey ?? 'placeholder',
-})
+      });
+    }
+    return Reflect.get(_anthropicInstance, prop, receiver);
+  }
+});
 
 // Modelo: Haiku 4.5 — rápido y preciso para extracción estructurada
 export const CAPTURE_MODEL = 'claude-haiku-4-5-20251001'

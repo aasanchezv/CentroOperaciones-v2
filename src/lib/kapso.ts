@@ -6,10 +6,20 @@ if (!ApiKey) {
   console.warn('[kapso] KAPSO_API_KEY no configurado — WhatsApp no se enviará');
 }
 
-export const kapso = new WhatsAppClient({
-  baseUrl:     'https://api.kapso.ai/meta/whatsapp',
-  kapsoApiKey: ApiKey ?? 'placeholder',
-})
+let _kapsoInstance: any = null;
+
+export const kapso = new Proxy({} as WhatsAppClient, {
+  get(target, prop, receiver) {
+    if (!_kapsoInstance) {
+      _kapsoInstance = new WhatsAppClient({
+        baseUrl: 'https://api.kapso.ai/meta/whatsapp',
+        kapsoApiKey: ApiKey ?? 'placeholder',
+      });
+    }
+    return Reflect.get(_kapsoInstance, prop, receiver);
+  }
+});
+
 
 const PHONE_NUMBER_ID = process.env.KAPSO_PHONE_NUMBER_ID ?? ''
 
