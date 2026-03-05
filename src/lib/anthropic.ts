@@ -1,13 +1,16 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { createAdminClient } from '@/lib/supabase/admin'
 
-if (!process.env.ANTHROPIC_API_KEY) {
+
+const ApiKey = process.env.ANTHROPIC_API_KEY;
+
+if (!ApiKey) {
   console.warn('[anthropic] ANTHROPIC_API_KEY no configurado — la extracción IA no funcionará')
 }
 
 // Singleton para uso con env var (backward compat y uso sin async context)
 export const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY ?? 'placeholder',
+  apiKey: ApiKey ?? 'placeholder',
 })
 
 // Modelo: Haiku 4.5 — rápido y preciso para extracción estructurada
@@ -34,5 +37,5 @@ export async function getAnthropicClient(): Promise<Anthropic> {
   } catch {
     // Tabla aún no existe o sin registros → fallback a env var
   }
-  return new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY ?? 'placeholder' })
+  return new Anthropic({ apiKey: ApiKey ?? 'placeholder' })
 }

@@ -1,12 +1,14 @@
 import { WhatsAppClient } from '@kapso/whatsapp-cloud-api'
 
-if (!process.env.KAPSO_API_KEY) {
-  console.warn('[kapso] KAPSO_API_KEY no configurado — WhatsApp no se enviará')
+const ApiKey = process.env.KAPSO_API_KEY;
+
+if (!ApiKey) {
+  console.warn('[kapso] KAPSO_API_KEY no configurado — WhatsApp no se enviará');
 }
 
 export const kapso = new WhatsAppClient({
   baseUrl:     'https://api.kapso.ai/meta/whatsapp',
-  kapsoApiKey: process.env.KAPSO_API_KEY ?? 'placeholder',
+  kapsoApiKey: ApiKey ?? 'placeholder',
 })
 
 const PHONE_NUMBER_ID = process.env.KAPSO_PHONE_NUMBER_ID ?? ''
@@ -20,7 +22,7 @@ export type WAResult =
   | { ok: false; code: 'no_api_key' | 'session_expired' | 'send_error'; message: string }
 
 export async function sendWhatsApp(to: string, body: string): Promise<WAResult> {
-  if (!process.env.KAPSO_API_KEY || process.env.KAPSO_API_KEY === 'placeholder') {
+  if (!ApiKey || ApiKey === 'placeholder') {
     console.warn('[kapso] Skipping WhatsApp — no API key configured')
     return { ok: false, code: 'no_api_key', message: 'KAPSO_API_KEY no configurado' }
   }
